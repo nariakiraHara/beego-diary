@@ -347,39 +347,30 @@
                 }
             }
         },
-        "models.Profile": {
-            "title": "Profile",
-            "type": "object",
-            "properties": {
-                "Address": {
-                    "type": "string"
-                },
-                "Age": {
-                    "type": "integer",
-                    "format": "int64"
-                },
-                "Email": {
-                    "type": "string"
-                },
-                "Gender": {
-                    "type": "string"
-                }
-            }
-        },
         "models.User": {
             "title": "User",
             "type": "object",
             "properties": {
-                "Id": {
+                "Email": {
                     "type": "string"
                 },
-                "Password": {
-                    "type": "string"
+                "IsActive": {
+                    "type": "integer",
+                    "format": "int64"
                 },
-                "Profile": {
-                    "$ref": "#/definitions/models.Profile"
+                "created": {
+                    "type": "string",
+                    "format": "datetime"
                 },
-                "Username": {
+                "id": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "updated": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "userName": {
                     "type": "string"
                 }
             }

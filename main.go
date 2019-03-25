@@ -1,6 +1,7 @@
 package main
 
 import (
+	"api-sample/models"
 	_ "api-sample/routers"
 	"fmt"
 
@@ -17,6 +18,14 @@ func init() {
 	mysqldb := beego.AppConfig.String("mysqldb")
 	datasource := fmt.Sprintf("%s:%s@tcp(%s:3306)/%s?charset=utf8", mysqlUser, mysqlPass, mysqlHost, mysqldb)
 	orm.RegisterDataBase("default", "mysql", datasource, 30)
+
+	orm.RegisterModel(new(models.User))
+
+	//sync初期化時に同期をとる
+	err := orm.RunSyncdb("default", false, true)
+	if err != nil {
+		fmt.Println(err)
+	}
 }
 
 func main() {

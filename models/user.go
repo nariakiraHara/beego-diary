@@ -4,6 +4,8 @@ import (
 	"errors"
 	"strconv"
 	"time"
+
+	"github.com/astaxie/beego/orm"
 )
 
 var (
@@ -12,37 +14,48 @@ var (
 
 func init() {
 	UserList = make(map[string]*User)
-	u := User{"user_11111", "astaxie", "11111", Profile{"male", 20, "Singapore", "astaxie@gmail.com"}}
+	u := User{1, "astaxie", "11111", "example@gmail.com", 1, time.Now(), time.Now()}
 	UserList["user_11111"] = &u
 }
 
+// User is struct user info
 type User struct {
-	Id       string
-	Username string
-	Password string
-	Profile  Profile
+	ID       int64  `orm:"column(id);pk" json:"id"`
+	Username string `orm:"default(1)" json:"userName"`
+	Password string `json:"-"`
+	Email    string
+	IsActive int
+	Created  time.Time `orm:"auto_now_add;type(datetime)" json:"created"`
+	Updated  time.Time `orm:"auto_now_add;type(datetime)" json:"updated"`
 }
 
-type Profile struct {
-	Gender  string
-	Age     int
-	Address string
-	Email   string
+// TableName return tableName string
+func (this *User) TableName() string {
+	return "users"
 }
 
-func AddUser(u User) string {
-	u.Id = "user_" + strconv.FormatInt(time.Now().UnixNano(), 10)
-	UserList[u.Id] = &u
-	return u.Id
+// AddUser returns result ? ok : ng
+func AddUser(u *User) string {
+	o := orm.NewOrm()
+	o.Using("users")
+	u.IsActive = 1
+	res, err := o.Insert(u)
+	if err != nil {
+		panic(err.Error())
+	}
+	return strconv.FormatInt(res, 10)
 }
 
+// GetUser returns user information from userID
 func GetUser(uid string) (u *User, err error) {
 	if u, ok := UserList[uid]; ok {
 		return u, nil
 	}
-	return nil, errors.New("User not exists")
+	return u, errors.New("User not exists")
 }
 
+// GetAllUsers is called GET METHOD
+// returns all users information
 func GetAllUsers() map[string]*User {
 	return UserList
 }
@@ -54,18 +67,6 @@ func UpdateUser(uid string, uu *User) (a *User, err error) {
 		}
 		if uu.Password != "" {
 			u.Password = uu.Password
-		}
-		if uu.Profile.Age != 0 {
-			u.Profile.Age = uu.Profile.Age
-		}
-		if uu.Profile.Address != "" {
-			u.Profile.Address = uu.Profile.Address
-		}
-		if uu.Profile.Gender != "" {
-			u.Profile.Gender = uu.Profile.Gender
-		}
-		if uu.Profile.Email != "" {
-			u.Profile.Email = uu.Profile.Email
 		}
 		return u, nil
 	}
