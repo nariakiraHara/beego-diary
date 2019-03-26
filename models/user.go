@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/astaxie/beego/orm"
+	"golang.org/x/crypto/bcrypt"
 )
 
 var (
@@ -22,7 +23,7 @@ func init() {
 type User struct {
 	ID       int64  `orm:"column(id);pk" json:"id"`
 	Username string `orm:"default(1)" json:"userName"`
-	Password string `json:"-"`
+	Password string
 	Email    string
 	IsActive int
 	Created  time.Time `orm:"auto_now_add;type(datetime)" json:"created"`
@@ -38,6 +39,11 @@ func (this *User) TableName() string {
 func AddUser(u *User) string {
 	o := orm.NewOrm()
 	o.Using("users")
+	hashPass, err := passwordHash(u.Password)
+	if err != nil {
+		panic(err.Error())
+	}
+	u.Password = hashPass
 	u.IsActive = 1
 	res, err := o.Insert(u)
 	if err != nil {
@@ -84,4 +90,12 @@ func Login(username, password string) bool {
 
 func DeleteUser(uid string) {
 	delete(UserList, uid)
+}
+
+func passwordHash(pw string) (string, error) {
+	hash, err := bcrypt.GenerateFromPassword([]byte(pw), bcrypt.DefaultCost)
+	if err != nil {
+		return "", err
+	}
+	return string(hash), err
 }

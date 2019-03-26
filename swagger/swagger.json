@@ -358,6 +358,9 @@
                     "type": "integer",
                     "format": "int64"
                 },
+                "Password": {
+                    "type": "string"
+                },
                 "created": {
                     "type": "string",
                     "format": "datetime"
