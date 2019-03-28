@@ -234,12 +234,17 @@ definitions:
     title: User
     type: object
     properties:
+      Birthday:
+        type: string
+        format: datetime
       Email:
         type: string
       IsActive:
         type: integer
         format: int64
       Password:
+        type: string
+      comment:
         type: string
       created:
         type: string

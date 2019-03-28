@@ -3,6 +3,7 @@ package controllers
 import (
 	"api-sample/models"
 	"encoding/json"
+	"strconv"
 
 	"github.com/astaxie/beego"
 )
@@ -43,14 +44,12 @@ func (u *UserController) GetAll() {
 // @Failure 403 :uid is empty
 // @router /:uid [get]
 func (u *UserController) Get() {
-	uid := u.GetString(":uid")
-	if uid != "" {
-		user, err := models.GetUser(uid)
-		if err != nil {
-			u.Data["json"] = err.Error()
-		} else {
-			u.Data["json"] = user
-		}
+	uid, _ := strconv.ParseInt(u.GetString(":uid"), 10, 64)
+	user, err := models.GetUser(uid)
+	if err != nil {
+		u.Data["json"] = err.Error()
+	} else {
+		u.Data["json"] = user
 	}
 	u.ServeJSON()
 }

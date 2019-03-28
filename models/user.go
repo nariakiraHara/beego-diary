@@ -13,18 +13,14 @@ var (
 	UserList map[string]*User
 )
 
-func init() {
-	UserList = make(map[string]*User)
-	u := User{1, "astaxie", "11111", "example@gmail.com", 1, time.Now(), time.Now()}
-	UserList["user_11111"] = &u
-}
-
 // User is struct user info
 type User struct {
 	ID       int64  `orm:"column(id);pk" json:"id"`
 	Username string `orm:"default(1)" json:"userName"`
 	Password string
 	Email    string
+	Birthday time.Time `orm:"null;type(datetime)"`
+	Comment  string    `orm:"null" json:"comment"`
 	IsActive int
 	Created  time.Time `orm:"auto_now_add;type(datetime)" json:"created"`
 	Updated  time.Time `orm:"auto_now_add;type(datetime)" json:"updated"`
@@ -53,8 +49,11 @@ func AddUser(u *User) string {
 }
 
 // GetUser returns user information from userID
-func GetUser(uid string) (u *User, err error) {
-	if u, ok := UserList[uid]; ok {
+func GetUser(uid int64) (u *User, err error) {
+	o := orm.NewOrm()
+	user := User{ID: uid}
+	if err := o.Read(&user); err == nil {
+		u = &user
 		return u, nil
 	}
 	return u, errors.New("User not exists")
